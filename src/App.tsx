@@ -1,20 +1,18 @@
 import { useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import {
-  TrendingUp,
+  Brain,
   Database,
   BarChart3,
-  Users,
-  Palette,
-  Brain,
   Code,
-  CheckCircle2
+  Users,
+  ArrowRight,
+  Github,
+  Mail,
+  CheckCircle2,
+  ExternalLink,
 } from 'lucide-react';
 
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+const SLACK_WEBHOOK_URL = import.meta.env.VITE_SLACK_WEBHOOK_URL;
 
 interface Service {
   icon: React.ReactNode;
@@ -23,253 +21,247 @@ interface Service {
 }
 
 function App() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    company: '',
-    message: '',
-    newsletter_opt_in: false
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
   const services: Service[] = [
     {
-      icon: <TrendingUp className="w-6 h-6" />,
-      title: "Software Investment Analysis",
-      description: "Strategic evaluation of technology investments to maximize ROI and business value."
+      icon: <Brain className="w-5 h-5" />,
+      title: 'Bespoke AI Services',
+      description:
+        'Custom AI solutions designed around your business — from LLM integration to autonomous agents and intelligent workflows.',
     },
     {
-      icon: <Database className="w-6 h-6" />,
-      title: "Data Preparation & Platform Implementation",
-      description: "Build robust data foundations with expert platform implementation and optimization."
+      icon: <Database className="w-5 h-5" />,
+      title: 'Data & Analytics Foundations',
+      description:
+        'Modern data platform setup, pipeline engineering, and analytics infrastructure that scales with you.',
     },
     {
-      icon: <BarChart3 className="w-6 h-6" />,
-      title: "Outsourced Data Analytics",
-      description: "Comprehensive analytics services to transform your data into actionable insights."
+      icon: <Code className="w-5 h-5" />,
+      title: 'Software Platform Engineering',
+      description:
+        'End-to-end platform builds, cloud architecture, and developer tooling for high-growth teams.',
     },
     {
-      icon: <Users className="w-6 h-6" />,
-      title: "Growth Teams",
-      description: "Dedicated teams to accelerate your product development and business growth."
+      icon: <Users className="w-5 h-5" />,
+      title: 'Advisory & Consulting',
+      description:
+        'Strategic technology guidance from senior practitioners — AI readiness, data strategy, and build-vs-buy decisions.',
     },
     {
-      icon: <Palette className="w-6 h-6" />,
-      title: "Product Design",
-      description: "User-centered design that creates exceptional digital experiences."
+      icon: <BarChart3 className="w-5 h-5" />,
+      title: 'Our Products',
+      description:
+        'We build and ship our own applications. Check out what we\'re working on.',
     },
-    {
-      icon: <Brain className="w-6 h-6" />,
-      title: "AI Engineering & Readiness",
-      description: "Strategic AI implementation and organizational readiness assessments."
-    },
-    {
-      icon: <Code className="w-6 h-6" />,
-      title: "Data Engineering Consulting",
-      description: "Expert partnerships to build scalable data infrastructure and pipelines."
-    }
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus('idle');
+    if (!email) return;
+    setStatus('sending');
 
     try {
-      const { error } = await supabase
-        .from('contact_submissions')
-        .insert([formData]);
-
-      if (error) throw error;
-
-      setSubmitStatus('success');
-      setFormData({
-        name: '',
-        email: '',
-        company: '',
-        message: '',
-        newsletter_opt_in: false
-      });
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
+      if (SLACK_WEBHOOK_URL) {
+        await fetch(SLACK_WEBHOOK_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            text: `New signup from par72.us: ${email}`,
+          }),
+        });
+      }
+      setStatus('success');
+      setEmail('');
+    } catch {
+      setStatus('error');
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      {/* Hero Section */}
-      <header className="container mx-auto px-6 pt-20 pb-32">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-6xl md:text-7xl font-light tracking-tight text-slate-900 mb-6">
-            Par<span className="font-semibold">72</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-slate-600 font-light leading-relaxed">
-            Strategic technology partnerships that drive measurable business outcomes.
-          </p>
+    <div className="min-h-screen bg-white text-slate-900">
+      {/* Nav */}
+      <nav className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-slate-100">
+        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+          <a href="#" className="flex items-center gap-2.5">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-slate-900 text-white text-xs font-bold tracking-tight">
+              72
+            </span>
+            <span className="font-semibold tracking-tight text-lg">
+              Par 72 Services
+            </span>
+          </a>
+          <div className="flex items-center gap-6">
+            <a
+              href="#services"
+              className="hidden sm:block text-sm text-slate-500 hover:text-slate-900 transition-colors"
+            >
+              Services
+            </a>
+            <a
+              href="#connect"
+              className="hidden sm:block text-sm text-slate-500 hover:text-slate-900 transition-colors"
+            >
+              Connect
+            </a>
+            <a
+              href="https://github.com/Par72-Org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-slate-900 transition-colors"
+            >
+              <Github className="w-5 h-5" />
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <header className="max-w-5xl mx-auto px-6 pt-24 pb-20 md:pt-36 md:pb-28">
+        <p className="text-sm uppercase tracking-[0.25em] text-slate-400 mb-6">
+          AI &middot; Data &middot; Software
+        </p>
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.08] mb-8 max-w-4xl">
+          We build the software
+          <br />
+          <span className="text-slate-400">you wish you had.</span>
+        </h1>
+        <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mb-10">
+          Par 72 Services is a professional services firm specializing in bespoke AI solutions,
+          modern data platforms, and custom software — built by senior engineers who ship.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <a
+            href="#connect"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 text-white px-6 py-3 text-sm font-medium hover:bg-slate-800 transition-colors"
+          >
+            Get in touch <ArrowRight className="w-4 h-4" />
+          </a>
+          <a
+            href="https://github.com/Par72-Org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 text-slate-700 px-6 py-3 text-sm font-medium hover:bg-slate-50 transition-colors"
+          >
+            <Github className="w-4 h-4" /> View our work
+          </a>
         </div>
       </header>
 
-      {/* Services Section */}
-      <section className="container mx-auto px-6 pb-32">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-light text-slate-900 mb-16 text-center">
-            Our Expertise
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {services.map((service, index) => (
-              <div
-                key={index}
-                className="group p-8 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-all duration-300 hover:shadow-lg"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-slate-100 rounded-lg text-slate-700 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-300">
-                    {service.icon}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-medium text-slate-900 mb-2">
-                      {service.title}
-                    </h3>
-                    <p className="text-slate-600 leading-relaxed">
-                      {service.description}
-                    </p>
-                  </div>
-                </div>
+      {/* Divider */}
+      <div className="max-w-5xl mx-auto px-6">
+        <hr className="border-slate-100" />
+      </div>
+
+      {/* Services */}
+      <section id="services" className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4">
+          What we do
+        </h2>
+        <p className="text-slate-500 mb-14 max-w-xl">
+          Custom technology services for companies that need it done right.
+        </p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {services.map((service, i) => (
+            <div
+              key={i}
+              className="group p-6 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200"
+            >
+              <div className="inline-flex p-2.5 rounded-lg bg-slate-50 text-slate-600 mb-4 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-200">
+                {service.icon}
               </div>
-            ))}
-          </div>
+              <h3 className="text-base font-medium mb-2">{service.title}</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                {service.description}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Contact Form Section */}
-      <section className="container mx-auto px-6 pb-32">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-2xl border border-slate-200 p-10 shadow-sm">
-            <h2 className="text-3xl font-light text-slate-900 mb-3">
-              Let's Connect
-            </h2>
-            <p className="text-slate-600 mb-8">
-              Share your vision and we'll explore how we can help you succeed.
-            </p>
+      {/* Divider */}
+      <div className="max-w-5xl mx-auto px-6">
+        <hr className="border-slate-100" />
+      </div>
 
-            {submitStatus === 'success' && (
-              <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                <p className="text-emerald-800">Thank you! We'll be in touch soon.</p>
-              </div>
-            )}
+      {/* Connect / Signup */}
+      <section id="connect" className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+        <div className="max-w-xl">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4">
+            Stay in the loop
+          </h2>
+          <p className="text-slate-500 mb-8">
+            Drop your email and we'll reach out. No spam — just occasional updates
+            on what we're building and how we can help.
+          </p>
 
-            {submitStatus === 'error' && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800">Something went wrong. Please try again.</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-shadow"
-                  placeholder="Your name"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-shadow"
-                  placeholder="you@company.com"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="company" className="block text-sm font-medium text-slate-700 mb-2">
-                  Company
-                </label>
-                <input
-                  type="text"
-                  id="company"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-shadow"
-                  placeholder="Your company"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-2">
-                  Message *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  value={formData.message}
-                  onChange={handleChange}
-                  rows={5}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-shadow resize-none"
-                  placeholder="Tell us about your project or inquiry..."
-                />
-              </div>
-
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="newsletter_opt_in"
-                  name="newsletter_opt_in"
-                  checked={formData.newsletter_opt_in}
-                  onChange={handleChange}
-                  className="mt-1 w-4 h-4 text-slate-900 border-slate-300 rounded focus:ring-2 focus:ring-slate-900"
-                />
-                <label htmlFor="newsletter_opt_in" className="text-sm text-slate-600">
-                  Yes, I'd like to receive updates and insights from Par72
-                </label>
-              </div>
-
+          {status === 'success' ? (
+            <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+              <p className="text-emerald-800 text-sm">
+                You're on the list. We'll be in touch.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSignup} className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                className="flex-1 px-4 py-3 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-shadow"
+              />
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-slate-900 text-white py-4 px-6 rounded-lg font-medium hover:bg-slate-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={status === 'sending'}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 text-white px-6 py-3 text-sm font-medium hover:bg-slate-800 transition-colors disabled:opacity-50"
               >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
+                <Mail className="w-4 h-4" />
+                {status === 'sending' ? 'Sending...' : 'Sign up'}
               </button>
             </form>
+          )}
+
+          {status === 'error' && (
+            <p className="mt-3 text-sm text-red-600">
+              Something went wrong. Try again or email us directly.
+            </p>
+          )}
+
+          <div className="mt-10 flex flex-col sm:flex-row gap-6 text-sm text-slate-500">
+            <a
+              href="mailto:kevin@par72.us"
+              className="inline-flex items-center gap-2 hover:text-slate-900 transition-colors"
+            >
+              <Mail className="w-4 h-4" /> kevin@par72.us
+            </a>
+            <a
+              href="https://github.com/Par72-Org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 hover:text-slate-900 transition-colors"
+            >
+              <Github className="w-4 h-4" /> github.com/Par72-Org
+            </a>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="container mx-auto px-6 py-12 border-t border-slate-200">
-        <div className="text-center text-slate-500 text-sm">
-          <p>© 2025 Par72. Strategic technology partnerships.</p>
+      <footer className="border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
+          <p>&copy; {new Date().getFullYear()} Par 72 Services</p>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://github.com/Par72-Org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-600 transition-colors"
+            >
+              <Github className="w-4 h-4" />
+            </a>
+          </div>
         </div>
       </footer>
     </div>
