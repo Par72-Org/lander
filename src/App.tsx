@@ -15,7 +15,6 @@ import GolfFlag from './components/GolfFlag';
 import TiltCard from './components/TiltCard';
 import CursorGlow from './components/CursorGlow';
 
-const SLACK_WEBHOOK_URL = import.meta.env.VITE_SLACK_WEBHOOK_URL;
 
 interface Service {
   icon: React.ReactNode;
@@ -66,14 +65,12 @@ function App() {
     setStatus('sending');
 
     try {
-      if (SLACK_WEBHOOK_URL) {
-        await fetch(SLACK_WEBHOOK_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            text: `New signup from par72.us: ${email}`,
-          }),
-        });
-      }
+      const resp = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!resp.ok) throw new Error();
       setStatus('success');
       setEmail('');
     } catch {
