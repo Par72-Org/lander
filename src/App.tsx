@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Brain,
@@ -12,8 +12,8 @@ import {
   Quote,
 } from 'lucide-react';
 import GolfFlag from './components/GolfFlag';
-
-const HeroScene = lazy(() => import('./components/HeroScene'));
+import TiltCard from './components/TiltCard';
+import CursorGlow from './components/CursorGlow';
 
 const SLACK_WEBHOOK_URL = import.meta.env.VITE_SLACK_WEBHOOK_URL;
 
@@ -82,9 +82,11 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen text-slate-900 mesh-gradient">
+      <CursorGlow />
+
       {/* Nav */}
-      <nav className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-slate-100">
+      <nav className="sticky top-0 z-40 backdrop-blur bg-white/70 border-b border-slate-100">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
             <GolfFlag className="w-6 h-6 text-slate-900" />
@@ -114,10 +116,7 @@ function App() {
       </nav>
 
       {/* Hero */}
-      <header className="relative max-w-5xl mx-auto px-6 pt-24 pb-20 md:pt-36 md:pb-28">
-        <Suspense fallback={null}>
-          <HeroScene />
-        </Suspense>
+      <header className="max-w-5xl mx-auto px-6 pt-12 pb-16 md:pt-20 md:pb-24">
         <p className="text-sm uppercase tracking-[0.25em] text-slate-400 mb-6">
           AI &middot; Data &middot; Software
         </p>
@@ -139,7 +138,7 @@ function App() {
           </a>
           <Link
             to="/projects"
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 text-slate-700 px-6 py-3 text-sm font-medium hover:bg-slate-50 transition-colors"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white/50 text-slate-700 px-6 py-3 text-sm font-medium hover:bg-white transition-colors"
           >
             View our work <ArrowRight className="w-4 h-4" />
           </Link>
@@ -148,7 +147,7 @@ function App() {
 
       {/* Divider */}
       <div className="max-w-5xl mx-auto px-6">
-        <hr className="border-slate-100" />
+        <hr className="border-slate-200/60" />
       </div>
 
       {/* Services */}
@@ -161,25 +160,24 @@ function App() {
         </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((service, i) => (
-            <div
-              key={i}
-              className="group p-4 rounded-lg border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200"
-            >
-              <div className="inline-flex p-2 rounded-md bg-slate-50 text-slate-600 mb-3 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-200">
-                {service.icon}
+            <TiltCard key={i}>
+              <div className="group p-4 rounded-lg border border-slate-200/60 bg-white/60 backdrop-blur-sm hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all duration-200 h-full">
+                <div className="inline-flex p-2 rounded-md bg-slate-50 text-slate-600 mb-3 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-200">
+                  {service.icon}
+                </div>
+                <h3 className="text-sm font-medium mb-1">{service.title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  {service.description}
+                </p>
               </div>
-              <h3 className="text-sm font-medium mb-1">{service.title}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                {service.description}
-              </p>
-            </div>
+            </TiltCard>
           ))}
         </div>
       </section>
 
       {/* Divider */}
       <div className="max-w-5xl mx-auto px-6">
-        <hr className="border-slate-100" />
+        <hr className="border-slate-200/60" />
       </div>
 
       {/* Testimonial */}
@@ -199,7 +197,7 @@ function App() {
 
       {/* Divider */}
       <div className="max-w-5xl mx-auto px-6">
-        <hr className="border-slate-100" />
+        <hr className="border-slate-200/60" />
       </div>
 
       {/* Connect / Signup */}
@@ -231,7 +229,7 @@ function App() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
-                className="flex-1 px-4 py-3 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-shadow"
+                className="flex-1 px-4 py-3 border border-slate-200 rounded-lg text-sm bg-white/70 backdrop-blur-sm focus:bg-white focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition-all"
               />
               <button
                 type="submit"
@@ -262,9 +260,9 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-100">
+      <footer className="border-t border-slate-200/60">
         <div className="max-w-5xl mx-auto px-6 py-8 text-center text-sm text-slate-400">
-          <p>&copy; {new Date().getFullYear()} Par72 Development Services</p>
+          <p>&copy; {new Date().getFullYear()} Par72</p>
         </div>
       </footer>
     </div>

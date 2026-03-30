@@ -8,3 +8,37 @@
   h1, h2, h3 { font-family: 'Sora', ui-sans-serif, system-ui, -apple-system, sans-serif; }
   ::selection { background-color: #0f172a; color: #fff; }
 }
+
+/* Animated mesh gradient — uses pseudo-elements for smooth animation */
+.mesh-gradient {
+  position: relative;
+}
+.mesh-gradient::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -20;
+  opacity: 1;
+  background:
+    radial-gradient(ellipse 600px 600px at 20% 40%, rgba(99,102,241,0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 80% 20%, rgba(14,165,233,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 550px 550px at 60% 80%, rgba(16,185,129,0.1) 0%, transparent 70%);
+  animation: mesh-drift 25s ease-in-out infinite alternate;
+}
+
+@keyframes mesh-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  25%  { transform: translate(40px, -30px) scale(1.05); }
+  50%  { transform: translate(-30px, 20px) scale(0.97); }
+  75%  { transform: translate(20px, 40px) scale(1.03); }
+  100% { transform: translate(-20px, -20px) scale(1); }
+}
+
+/* Cursor glow fade-in */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 1s ease-out 0.5s forwards;
+}
