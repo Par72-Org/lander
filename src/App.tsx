@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Brain,
   Database,
@@ -6,11 +7,13 @@ import {
   Code,
   Users,
   ArrowRight,
-  Github,
   Mail,
   CheckCircle2,
-  ExternalLink,
+  Quote,
 } from 'lucide-react';
+import GolfFlag from './components/GolfFlag';
+
+const HeroScene = lazy(() => import('./components/HeroScene'));
 
 const SLACK_WEBHOOK_URL = import.meta.env.VITE_SLACK_WEBHOOK_URL;
 
@@ -83,14 +86,10 @@ function App() {
       {/* Nav */}
       <nav className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-slate-100">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2.5">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-slate-900 text-white text-xs font-bold tracking-tight">
-              72
-            </span>
-            <span className="font-semibold tracking-tight text-lg">
-              Par 72 Services
-            </span>
-          </a>
+          <Link to="/" className="flex items-center gap-2.5">
+            <GolfFlag className="w-6 h-6 text-slate-900" />
+            <span className="font-semibold tracking-tight text-lg">Par72</span>
+          </Link>
           <div className="flex items-center gap-6">
             <a
               href="#services"
@@ -98,26 +97,27 @@ function App() {
             >
               Services
             </a>
+            <Link
+              to="/projects"
+              className="hidden sm:block text-sm text-slate-500 hover:text-slate-900 transition-colors"
+            >
+              Projects
+            </Link>
             <a
               href="#connect"
               className="hidden sm:block text-sm text-slate-500 hover:text-slate-900 transition-colors"
             >
               Connect
             </a>
-            <a
-              href="https://github.com/Par72-Org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-slate-400 hover:text-slate-900 transition-colors"
-            >
-              <Github className="w-5 h-5" />
-            </a>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <header className="max-w-5xl mx-auto px-6 pt-24 pb-20 md:pt-36 md:pb-28">
+      <header className="relative max-w-5xl mx-auto px-6 pt-24 pb-20 md:pt-36 md:pb-28">
+        <Suspense fallback={null}>
+          <HeroScene />
+        </Suspense>
         <p className="text-sm uppercase tracking-[0.25em] text-slate-400 mb-6">
           AI &middot; Data &middot; Software
         </p>
@@ -127,8 +127,8 @@ function App() {
           <span className="text-slate-400">you wish you had.</span>
         </h1>
         <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mb-10">
-          Par 72 Services is a professional services firm specializing in bespoke AI solutions,
-          modern data platforms, and custom software — built by senior engineers who ship.
+          Par72 Development Services is a professional services firm specializing in bespoke AI solutions,
+          modern data platforms, and custom software — built by those who ship.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <a
@@ -137,14 +137,12 @@ function App() {
           >
             Get in touch <ArrowRight className="w-4 h-4" />
           </a>
-          <a
-            href="https://github.com/Par72-Org"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to="/projects"
             className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 text-slate-700 px-6 py-3 text-sm font-medium hover:bg-slate-50 transition-colors"
           >
-            <Github className="w-4 h-4" /> View our work
-          </a>
+            View our work <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </header>
 
@@ -154,24 +152,24 @@ function App() {
       </div>
 
       {/* Services */}
-      <section id="services" className="max-w-5xl mx-auto px-6 py-20 md:py-28">
+      <section id="services" className="max-w-5xl mx-auto px-6 py-16 md:py-20">
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4">
           What we do
         </h2>
-        <p className="text-slate-500 mb-14 max-w-xl">
+        <p className="text-slate-500 mb-10 max-w-xl">
           Custom technology services for companies that need it done right.
         </p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {services.map((service, i) => (
             <div
               key={i}
-              className="group p-6 rounded-xl border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200"
+              className="group p-4 rounded-lg border border-slate-100 hover:border-slate-200 hover:shadow-sm transition-all duration-200"
             >
-              <div className="inline-flex p-2.5 rounded-lg bg-slate-50 text-slate-600 mb-4 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-200">
+              <div className="inline-flex p-2 rounded-md bg-slate-50 text-slate-600 mb-3 group-hover:bg-slate-900 group-hover:text-white transition-colors duration-200">
                 {service.icon}
               </div>
-              <h3 className="text-base font-medium mb-2">{service.title}</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">
+              <h3 className="text-sm font-medium mb-1">{service.title}</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
                 {service.description}
               </p>
             </div>
@@ -184,12 +182,35 @@ function App() {
         <hr className="border-slate-100" />
       </div>
 
+      {/* Testimonial */}
+      <section className="max-w-5xl mx-auto px-6 py-16 md:py-20">
+        <div className="max-w-2xl mx-auto text-center">
+          <Quote className="w-8 h-8 text-slate-200 mx-auto mb-6" />
+          <blockquote className="text-xl md:text-2xl font-light text-slate-700 leading-relaxed mb-6">
+            "Praesent commodo cursus magna, vel scelerisque nisl consectetur et.
+            Donec sed odio dui. Maecenas faucibus mollis interdum."
+          </blockquote>
+          <div className="text-sm text-slate-400">
+            <p className="font-medium text-slate-500">Nomen Cognomen</p>
+            <p>VP Engineering, Acme Corp</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="max-w-5xl mx-auto px-6">
+        <hr className="border-slate-100" />
+      </div>
+
       {/* Connect / Signup */}
       <section id="connect" className="max-w-5xl mx-auto px-6 py-20 md:py-28">
         <div className="max-w-xl">
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4">
-            Stay in the loop
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-2">
+            Need a loop?
           </h2>
+          <p className="text-sm text-slate-400 italic mb-4">
+            In caddy speak, a loop is a round. Let us carry the bag.
+          </p>
           <p className="text-slate-500 mb-8">
             Drop your email and we'll reach out. No spam — just occasional updates
             on what we're building and how we can help.
@@ -229,20 +250,12 @@ function App() {
             </p>
           )}
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-6 text-sm text-slate-500">
+          <div className="mt-10">
             <a
-              href="mailto:kevin@par72.us"
-              className="inline-flex items-center gap-2 hover:text-slate-900 transition-colors"
+              href="mailto:hello@par72.us"
+              className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors"
             >
-              <Mail className="w-4 h-4" /> kevin@par72.us
-            </a>
-            <a
-              href="https://github.com/Par72-Org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 hover:text-slate-900 transition-colors"
-            >
-              <Github className="w-4 h-4" /> github.com/Par72-Org
+              <Mail className="w-4 h-4" /> hello@par72.us
             </a>
           </div>
         </div>
@@ -250,18 +263,8 @@ function App() {
 
       {/* Footer */}
       <footer className="border-t border-slate-100">
-        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
-          <p>&copy; {new Date().getFullYear()} Par 72 Services</p>
-          <div className="flex items-center gap-4">
-            <a
-              href="https://github.com/Par72-Org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-slate-600 transition-colors"
-            >
-              <Github className="w-4 h-4" />
-            </a>
-          </div>
+        <div className="max-w-5xl mx-auto px-6 py-8 text-center text-sm text-slate-400">
+          <p>&copy; {new Date().getFullYear()} Par72 Development Services</p>
         </div>
       </footer>
     </div>
